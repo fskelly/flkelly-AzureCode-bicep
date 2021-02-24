@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logAnalyticsWorkspaceID": {
+      "type": "string"
+    },
+    "hostpoolName": {
+      "type": "string"
+    },
+    "workspaceName": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "microsoft.insights/diagnosticSettings",
+      "apiVersion": "2017-05-01-preview",
+      "scope": "[format('Microsoft.DesktopVirtualization/hostPools/{0}', parameters('hostpoolName'))]",
+      "name": "hostpool-diag",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceID')]",
+        "logs": [
+          {
+            "category": "Checkpoint",
+            "enabled": true
+          },
+          {
+            "category": "Error",
+            "enabled": true
+          },
+          {
+            "category": "Management",
+            "enabled": true
+          },
+          {
+            "category": "Connection",
+            "enabled": true
+          },
+          {
+            "category": "HostRegistration",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "microsoft.insights/diagnosticSettings",
+      "apiVersion": "2017-05-01-preview",
+      "scope": "[format('Microsoft.DesktopVirtualization/hostPools/{0}', parameters('hostpoolName'))]",
+      "name": "workspacepool-diag",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceID')]",
+        "logs": [
+          {
+            "category": "Checkpoint",
+            "enabled": true
+          },
+          {
+            "category": "Error",
+            "enabled": true
+          },
+          {
+            "category": "Management",
+            "enabled": true
+          },
+          {
+            "category": "Feed",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": []
+    }
+  ],
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "dev",
+      "templateHash": "7596586815935728892"
+    }
+  }
+}
