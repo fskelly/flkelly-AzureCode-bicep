@@ -1,0 +1,1 @@
+az deployment group create -f ./main.json -g my-rg --parameters ./parameters.main.json
