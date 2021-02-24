@@ -1,6 +1,21 @@
-param vnetAddressPrefix string
-param subnetPrefix string
-param location string
+param vnetAddressPrefix string {
+  metadata: {
+    description: 'address prefix'
+  }
+  default: '10.0.0.0/16'
+}
+param subnetPrefix string {
+  metadata: {
+    description: 'Subnet prefix'
+  }
+  default: '10.0.0.0/24'
+}
+param location string {
+  metadata: {
+    description: 'Location for all resources.'
+  }
+  default: resourceGroup().location
+}
 
 var virtualNetworkName_var = 'myVNet'
 var subnetName = 'myBackendSubnet'
