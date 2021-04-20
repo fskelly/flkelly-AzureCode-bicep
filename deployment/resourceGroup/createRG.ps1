@@ -44,26 +44,6 @@ function Get-RegionShortName {
         'switzerlandnorth' {''; break}
         'uaenorth' {''; break}
         'brazilsouth' {''; break}
-        'centralusstage' {''; break}
-        'eastusstage' {''; break}
-        'eastus2stage' {''; break}
-        'northcentralusstage' {''; break}
-        'southcentralusstage' {''; break}
-        'westusstage' {''; break}
-        'westus2stage' {''; break}
-        'asia' {''; break}
-        'asiapacific' {''; break}
-        'australia' {''; break}
-        'brazil' {''; break}
-        'canada' {''; break}
-        'europe' {''; break}
-        'global' {''; break}
-        'india' {''; break}
-        'japan' {''; break}
-        'uk' {''; break}
-        'unitedstates' {''; break}
-        'eastasiastage' {''; break}
-        'southeastasiastage' {''; break}
         'centraluseuap' {''; break}
         'westus3' {''; break}
         'southafricawest' {''; break}
