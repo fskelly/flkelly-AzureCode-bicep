@@ -14,3 +14,9 @@ foreach ($Folder in $moduleFolders) {
         }
     }
 }
+
+Select-AzureSubscription
+#Select-AzureRegion
+## let's get the region name and the calculated shortname
+
+Write-Header "Done! Use ./resourceGroup/createRG.ps1 to start the process"
