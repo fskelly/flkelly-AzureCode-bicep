@@ -2,5 +2,6 @@
 *.key.azcli
 *.parameters.json
 *.personal.*
+*.json
 data/**
 development/**
