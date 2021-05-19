@@ -3,37 +3,38 @@ var diskSku = 'Premium_LRS'
 var defaultVmName = '${vmPrefix}-${environmentName}'
 var defaultVmNicName = '${defaultVmName}-nic'
 
-
-
-param vmOS string {
-  default: '2019-Datacenter'
-  allowed: [
-      '2016-Datacenter'
-      '2016-Datacenter-Server-Core'
-      '2016-Datacenter-Server-Core-smalldisk'
-      '2019-Datacenter'
-      '2019-Datacenter-Server-Core'
-      '2019-Datacenter-Server-Core-smalldisk'
-    ] 
-}
-param localAdminPassword string {
-  secure: true
-  metadata: {
-      description: 'password for the windows VM'
-  }
-}
-param vmPrefix string {
-  minLength: 1
-  maxLength: 9
-}
-param environmentName string {
-  allowed: [
-    'prod'
-    'dev'
-  ]
+param resourceTags object = {
+  Environment: 'Dev'
+  Project: 'Tutorial'
 }
 
-module networkID './network.bicep' = {
+@allowed([
+  '2016-Datacenter'
+  '2016-Datacenter-Server-Core'
+  '2016-Datacenter-Server-Core-smalldisk'
+  '2019-Datacenter'
+  '2019-Datacenter-Server-Core'
+  '2019-Datacenter-Server-Core-smalldisk'
+])
+param vmOS string = '2019-Datacenter'
+
+@metadata({
+  description: 'password for the windows VM'
+})
+@secure()
+param localAdminPassword string 
+
+@minLength(1)
+@maxLength(9)
+param vmPrefix string
+
+@allowed([
+  'prod'
+  'dev'
+])
+param environmentName string
+
+module networkID './modules/network.bicep' = {
   name: 'networkID'
   params: {
     vnetName: '${defaultVmName}-vnet'
@@ -50,7 +51,7 @@ resource vmNic 'Microsoft.Network/networkInterfaces@2017-06-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${networkID}/subnets/defaultSubnemt'
+            id: '${networkID.outputs.vnetID}/subnets/defaultSubnet'
           }
           privateIPAllocationMethod: 'Dynamic'
         }

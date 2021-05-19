@@ -1,6 +1,6 @@
 // Param Section
-param  vnetName string
-param  vnetPrefix string
+param vnetName string
+param vnetPrefix string
 param vnetLocation string = resourceGroup().location
 
 // VNET 
@@ -15,7 +15,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
     }
     subnets: [
       {
-        name: 'defaultSubnemt'
+        name: 'defaultSubnet'
         properties: {
           addressPrefix: vnetPrefix
           networkSecurityGroup: {
