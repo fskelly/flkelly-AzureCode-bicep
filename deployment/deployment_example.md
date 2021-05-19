@@ -8,8 +8,9 @@ az deployment group create \
 
 ```powershell
 $bicepFile = "{provide-the-path-to-the-bicep-file}"
+$resourceGroupName = "{provide-the-resource-group-name}"
 New-AzResourceGroupDeployment `
   -Name firstbicep `
-  -ResourceGroupName myResourceGroup `
+  -ResourceGroupName $resourceGroupName `
   -TemplateFile $bicepFile
 ```

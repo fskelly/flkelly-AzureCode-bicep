@@ -16,9 +16,9 @@ function New-ResourceGroup {
 
 ##run queries to get data
 $shortname, $region = Select-AzureRegion
-
-$suffix = 1
-$rgName = Get-ResourceGroupAvailability -alias $alias -region $region -shortname $shortname -suffix $suffix
+$alias = "flkelly"
+##$suffix = 1
+$rgName = Get-ResourceGroupAvailability -alias $alias -region $region -shortname $shortname ##-startSuffix $suffix
 
 Write-Header "Creating Resource Group - $rgName"
 

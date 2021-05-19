@@ -1,6 +1,4 @@
 targetScope = 'subscription'
-
-//Define WVD deployment parameters
 param resourceGroupPrefrix string = 'flkelly-weu-bicep-wvd-'
 param hostpoolName string = 'myBicepHostpool'
 param hostpoolFriendlyName string = 'My Bicep deployed Hostpool'
@@ -13,43 +11,40 @@ param wvdbackplanelocation string = 'eastus'
 param hostPoolType string = 'pooled'
 param loadBalancerType string = 'BreadthFirst'
 param logAnalyticsWorkspaceName string = 'flkelly-weu-azuremonitor'
-
-//Define Networking deployment parameters
 param vnetName string = 'bicep-vnet'
 param vnetaddressPrefix string = '10.0.0.0/15'
 param subnetPrefix string = '10.0.1.0/24'
 param vnetLocation string = 'westeurope'
 param subnetName string = 'bicep-subnet'
-
-//Define Azure Files deployment parameters
 param storageaccountlocation string = 'westeurope'
 param storageaccountName string = 'bicepsa'
 param storageaccountkind string = 'FileStorage'
 param storgeaccountglobalRedundancy string = 'Premium_LRS'
 param fileshareFolderName string = 'profilecontainers'
 
-//Create Resource Groups
-resource rgwvd 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+resource 0_BACKPLANE_resourceGroupPrefrix 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${resourceGroupPrefrix}BACKPLANE'
   location: 'westeurope'
 }
-resource rgnetw 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+
+resource 0_NETWORK_resourceGroupPrefrix 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${resourceGroupPrefrix}NETWORK'
   location: 'westeurope'
 }
-resource rgfs 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+
+resource 0_FILESERVICES_resourceGroupPrefrix 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${resourceGroupPrefrix}FILESERVICES'
   location: 'westeurope'
 }
-resource rdmon 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+
+resource 0_MONITOR_resourceGroupPrefrix 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${resourceGroupPrefrix}MONITOR'
   location: 'westeurope'
 }
 
-//Create WVD backplane objects and configure Log Analytics Diagnostics Settings
-module wvdbackplane './wvd-backplane-module.bicep' = {
+module wvdbackplane './nested_wvdbackplane.bicep' = {
   name: 'wvdbackplane'
-  scope: rgwvd
+  scope: resourceGroup('${resourceGroupPrefrix}BACKPLANE')
   params: {
     hostpoolName: hostpoolName
     hostpoolFriendlyName: hostpoolFriendlyName
@@ -63,15 +58,18 @@ module wvdbackplane './wvd-backplane-module.bicep' = {
     hostPoolType: hostPoolType
     loadBalancerType: loadBalancerType
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-    logAnalyticsResourceGroup: rdmon.name
-    wvdBackplaneResourceGroup: rgwvd.name
+    logAnalyticsResourceGroup: '${resourceGroupPrefrix}MONITOR'
+    wvdBackplaneResourceGroup: '${resourceGroupPrefrix}BACKPLANE'
   }
+  dependsOn: [
+    subscriptionResourceId('Microsoft.Resources/resourceGroups', '${resourceGroupPrefrix}MONITOR')
+    subscriptionResourceId('Microsoft.Resources/resourceGroups', '${resourceGroupPrefrix}BACKPLANE')
+  ]
 }
 
-//Create WVD Netwerk and Subnet
-module wvdnetwork './wvd-network-module.bicep' = {
+module wvdnetwork './nested_wvdnetwork.bicep' = {
   name: 'wvdnetwork'
-  scope: rgnetw
+  scope: resourceGroup('${resourceGroupPrefrix}NETWORK')
   params: {
     vnetName: vnetName
     vnetaddressPrefix: vnetaddressPrefix
@@ -79,12 +77,14 @@ module wvdnetwork './wvd-network-module.bicep' = {
     vnetLocation: vnetLocation
     subnetName: subnetName
   }
+  dependsOn: [
+    subscriptionResourceId('Microsoft.Resources/resourceGroups', '${resourceGroupPrefrix}NETWORK')
+  ]
 }
 
-//Create WVD Azure File Services and FileShare`
-module wvdFileServices './wvd-fileservices-module.bicep' = {
+module wvdFileServices './nested_wvdFileServices.bicep' = {
   name: 'wvdFileServices'
-  scope: rgfs
+  scope: resourceGroup('${resourceGroupPrefrix}FILESERVICES')
   params: {
     storageaccountlocation: storageaccountlocation
     storageaccountName: storageaccountName
@@ -92,4 +92,7 @@ module wvdFileServices './wvd-fileservices-module.bicep' = {
     storgeaccountglobalRedundancy: storgeaccountglobalRedundancy
     fileshareFolderName: fileshareFolderName
   }
+  dependsOn: [
+    subscriptionResourceId('Microsoft.Resources/resourceGroups', '${resourceGroupPrefrix}FILESERVICES')
+  ]
 }
