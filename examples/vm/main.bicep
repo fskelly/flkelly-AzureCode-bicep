@@ -3,6 +3,8 @@ var diskSku = 'Premium_LRS'
 var defaultVmName = '${vmPrefix}-${environmentName}'
 var defaultVmNicName = '${defaultVmName}-nic'
 
+
+
 param vmOS string {
   default: '2019-Datacenter'
   allowed: [

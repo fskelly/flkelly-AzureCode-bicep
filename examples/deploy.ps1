@@ -5,7 +5,8 @@ $tags = @{"deploymentMethod"="bicep"; "Can Be Deleted"="yes"}
 ## location to be deployed into
 $rgLocation = "westeurope"
 
-$rg = New-AzResourceGroup -Name $rgName -Location $rgLocation #use this command when you need to create a new resource group for your deployment
+#use this command when you need to create a new resource group for your deployment
+$rg = New-AzResourceGroup -Name $rgName -Location $rgLocation 
 New-AzTag -ResourceId $rg.ResourceId -Tag $tags
 
 ## arm file - for testing i use password
@@ -14,4 +15,4 @@ New-AzTag -ResourceId $rg.ResourceId -Tag $tags
 ## bicep Deployment
 ## Bicep File name
 $bicepFile = ""
-New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -authenticationType password
+New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile #-authenticationType password
