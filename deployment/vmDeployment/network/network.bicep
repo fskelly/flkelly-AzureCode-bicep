@@ -1,6 +1,6 @@
 // Param Section
-param  vnetName string
-param  vnetPrefix string
+param vnetName string
+param vnetPrefix string
 param vnetLocation string = resourceGroup().location
 
 // VNET 
