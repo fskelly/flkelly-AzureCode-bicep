@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupPrefrix": {
       "type": "string",
-      "defaultValue": "NINJA-WE-P-RG-WVD-BICEP-WVD-"
+      "defaultValue": "flkelly-weu-bicep-wvd-"
     },
     "hostpoolName": {
       "type": "string",
@@ -48,7 +48,7 @@
     },
     "logAnalyticsWorkspaceName": {
       "type": "string",
-      "defaultValue": "myNinjaBicepLAWorkspace"
+      "defaultValue": "flkelly-weu-azuremonitor"
     },
     "vnetName": {
       "type": "string",
@@ -631,8 +631,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "dev",
-      "templateHash": "6304098012347678765"
+      "version": "0.3.1.62928",
+      "templateHash": "17424418717313520748"
     }
   }
 }

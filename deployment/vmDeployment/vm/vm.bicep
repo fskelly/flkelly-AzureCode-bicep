@@ -1,13 +1,11 @@
+// Variables
+
 var defaultLocation = resourceGroup().location
 var diskSku = 'Premium_LRS'
 var defaultVmName = '${vmPrefix}-${environmentName}'
 var defaultVmNicName = '${defaultVmName}-nic'
 
-param resourceTags object = {
-  Environment: 'Dev'
-  Project: 'Tutorial'
-}
-
+// Parameters
 @allowed([
   '2016-Datacenter'
   '2016-Datacenter-Server-Core'
@@ -22,7 +20,7 @@ param vmOS string = '2019-Datacenter'
   description: 'password for the windows VM'
 })
 @secure()
-param localAdminPassword string 
+param localAdminPassword string
 
 @minLength(1)
 @maxLength(9)
@@ -34,7 +32,7 @@ param vmPrefix string
 ])
 param environmentName string
 
-module networkID './modules/network.bicep' = {
+module networkID '../network/network.bicep' = {
   name: 'networkID'
   params: {
     vnetName: '${defaultVmName}-vnet'

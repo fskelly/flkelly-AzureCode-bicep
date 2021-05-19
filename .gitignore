@@ -2,6 +2,6 @@
 *.key.azcli
 *.parameters.json
 *.personal.*
+*.json
 data/**
-deployment/**
 development/**
