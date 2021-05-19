@@ -35,6 +35,11 @@ param authenticationType string = 'sshPublicKey'
 @secure()
 param adminPasswordOrKey string
 
+param resourceTags object = {
+  Environment: 'Dev'
+  Project: 'Tutorial'
+}
+
 var namingInfix_var = toLower(substring(concat(vmssName, uniqueString(resourceGroup().id)), 0, 9))
 var newStorageAccountSuffix = '${namingInfix_var}sa'
 var longNamingInfix = toLower(vmssName)
@@ -81,6 +86,7 @@ var networkSecurityGroupName_var = '${subnetName}-nsg'
 
 resource networkSecurityGroupName 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
   name: networkSecurityGroupName_var
+  tags: resourceTags
   location: location
   properties: {
     securityRules: [
@@ -103,6 +109,7 @@ resource networkSecurityGroupName 'Microsoft.Network/networkSecurityGroups@2020-
 
 resource virtualNetworkName 'Microsoft.Network/virtualNetworks@2020-05-01' = {
   name: virtualNetworkName_var
+  tags: resourceTags
   location: location
   properties: {
     addressSpace: {
@@ -126,6 +133,7 @@ resource virtualNetworkName 'Microsoft.Network/virtualNetworks@2020-05-01' = {
 
 resource jumpBoxSAName 'Microsoft.Storage/storageAccounts@2019-06-01' = {
   name: jumpBoxSAName_var
+  tags: resourceTags
   location: location
   sku: {
     name: storageAccountType
@@ -135,6 +143,7 @@ resource jumpBoxSAName 'Microsoft.Storage/storageAccounts@2019-06-01' = {
 
 resource jumpBoxNicName 'Microsoft.Network/networkInterfaces@2020-05-01' = {
   name: jumpBoxNicName_var
+  tags: resourceTags
   location: location
   properties: {
     ipConfigurations: [
@@ -159,6 +168,7 @@ resource jumpBoxNicName 'Microsoft.Network/networkInterfaces@2020-05-01' = {
 
 resource publicIPAddressName 'Microsoft.Network/publicIPAddresses@2020-05-01' = {
   name: publicIPAddressName_var
+  tags: resourceTags
   location: location
   properties: {
     publicIPAllocationMethod: 'Dynamic'
@@ -170,6 +180,7 @@ resource publicIPAddressName 'Microsoft.Network/publicIPAddresses@2020-05-01' = 
 
 resource jumpBoxName 'Microsoft.Compute/virtualMachines@2020-06-01' = {
   name: jumpBoxName_var
+  tags: resourceTags
   location: location
   properties: {
     hardwareProfile: {
@@ -210,6 +221,7 @@ resource jumpBoxName 'Microsoft.Compute/virtualMachines@2020-06-01' = {
 
 resource loadBalancerName 'Microsoft.Network/loadBalancers@2020-05-01' = {
   name: loadBalancerName_var
+  tags: resourceTags
   location: location
   properties: {
     frontendIPConfigurations: [
@@ -249,6 +261,7 @@ resource loadBalancerName 'Microsoft.Network/loadBalancers@2020-05-01' = {
 
 resource namingInfix 'Microsoft.Compute/virtualMachineScaleSets@2020-06-01' = {
   name: namingInfix_var
+  tags: resourceTags
   location: location
   sku: {
     name: vmSku
