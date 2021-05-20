@@ -1,0 +1,8 @@
+#get publishera
+az vm image list-publishers -l westeurope --query [].name -o tsv
+
+##get offers
+az vm image list-offers -l westeurope -p Canonical --query [].name -o tsv
+
+## get skus
+az vm image list-skus -l westeurope -p Canonical -f UbuntuServer --query [].name -o tsv
