@@ -29,7 +29,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' ={
   tags: resourceTags
 }
 
-module storageResources './storage.bicep' ={
+module storageResources './modules/storage.bicep' ={
   name: '${rg.name}-${rgLocation}-storageResources'
   scope: rg
   params: {
@@ -40,7 +40,7 @@ module storageResources './storage.bicep' ={
   }
 }
 
-module vmResources 'vm.bicep' = {
+module vmResources './modules/vm.bicep' = {
   name: '${rg.name}-${rgLocation}-vmResources'
   scope: rg
   params: {
@@ -52,7 +52,7 @@ module vmResources 'vm.bicep' = {
     virtualNetworkID: networkResources.outputs.vnetID
   }  
 }
-module networkResources 'network.bicep' = {
+module networkResources './modules/network.bicep' = {
   name: '${rg.name}-${rgLocation}-networkResources'
   scope: rg
   params: {
