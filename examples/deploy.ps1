@@ -15,4 +15,6 @@ New-AzTag -ResourceId $rg.ResourceId -Tag $tags
 ## bicep Deployment
 ## Bicep File name
 $bicepFile = ""
-New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile #-authenticationType password
+
+$deploymentName = ($bicepFile).Substring(2) + "-" +(get-date -Format ddMMyyyy-hhmmss) + "-deployment"
+New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -name $deploymentName
