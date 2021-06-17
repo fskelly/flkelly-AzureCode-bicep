@@ -38,12 +38,28 @@ module networkID './modules/network.bicep' = {
   name: 'networkID'
   params: {
     vnetName: '${defaultVmName}-vnet'
-    vnetPrefix: '10.0.0.0/24'
+    addressSpacePrefix: '10.0.0.0/24'
+    vnetPrefix: '10.0.0.0/25'
   }
+}
+
+module bastion './modules/bastion.bicep' = {
+  name: 'bastion'
+  params: {
+    bastionHostName: '${defaultVmName}-bastion'
+    vnetName: '${defaultVmName}-vnet'
+    vnetIpPrefix: '10.0.0.0/25'
+    bastionSubnetIpPrefix: '10.0.0.192/27'
+    vnetNewOrExisting: 'existing'
+  }
+  dependsOn: [
+    networkID
+  ]
 }
 
 resource vmNic 'Microsoft.Network/networkInterfaces@2017-06-01' = {
   name: defaultVmNicName
+  tags: resourceTags
   location: defaultLocation
   properties: {
     ipConfigurations: [

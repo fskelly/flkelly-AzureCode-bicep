@@ -1,5 +1,6 @@
 // Param Section
 param vnetName string
+param addressSpacePrefix string
 param vnetPrefix string
 param vnetLocation string = resourceGroup().location
 
@@ -10,7 +11,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   properties: {
     addressSpace: {
       addressPrefixes: [
-        vnetPrefix
+        addressSpacePrefix
       ]
     }
     subnets: [
