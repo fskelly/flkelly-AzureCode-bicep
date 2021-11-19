@@ -2,7 +2,7 @@
 *.key.azcli
 *.parameters.json
 *.personal.*
-*.json
+##*.json
 data/**
 development/**
 .vscode/**

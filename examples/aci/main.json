@@ -1,0 +1,90 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.1008.15138",
+      "templateHash": "14123972587199656898"
+    }
+  },
+  "parameters": {
+    "containerName": {
+      "type": "string",
+      "defaultValue": "go-app"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westeurope"
+    },
+    "imageName": {
+      "type": "string",
+      "defaultValue": "markkerry/go-app:v1"
+    },
+    "cpuCores": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "memoryInGb": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "dnsName": {
+      "type": "string",
+      "defaultValue": "gowebapp001"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "[parameters('containerName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "containers": [
+          {
+            "name": "[parameters('containerName')]",
+            "properties": {
+              "image": "[parameters('imageName')]",
+              "resources": {
+                "requests": {
+                  "cpu": "[parameters('cpuCores')]",
+                  "memoryInGB": "[parameters('memoryInGb')]"
+                }
+              },
+              "ports": [
+                {
+                  "protocol": "TCP",
+                  "port": 3000
+                }
+              ]
+            }
+          }
+        ],
+        "restartPolicy": "OnFailure",
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "dnsNameLabel": "[parameters('dnsName')]",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": 3000
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "containerIpv4Address": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerName'))).ipAddress.ip]"
+    },
+    "containerDnsName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerName'))).ipAddress.fqdn]"
+    }
+  }
+}

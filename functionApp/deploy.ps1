@@ -6,7 +6,7 @@ $tags = @{"deploymentMethod"="bicep"; "Can Be Deleted"="yes"}
 $rgLocation = "northeurope"
 
 #use this command when you need to create a new resource group for your deployment
-$rg = New-AzResourceGroup -Name $rgName -Location $rgLocation 
+$rg = New-AzResourceGroup -Name $rgName -Location $rgLocation -Force
 New-AzTag -ResourceId $rg.ResourceId -Tag $tags
 
 $bicepFile = ".\functionApp.bicep"
@@ -15,5 +15,5 @@ az bicep build --file $bicepFile
 $jsonFile = '.' + $bicepFile.Split('.')[1] + '.json'
 
 $deploymentName = ($bicepFile).Substring(2) + "-" +(get-date -Format ddMMyyyy-hhmmss) + "-deployment"
-#New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -name $deploymentName
-New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $jsonFile -name $deploymentName
+New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -name $deploymentName -verbose
+#New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $jsonFile -name $deploymentName

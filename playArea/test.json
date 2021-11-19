@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.1008.15138",
+      "templateHash": "8615313537275049232"
+    }
+  },
+  "parameters": {
+    "addressSapce": {
+      "type": "string",
+      "defaultValue": "10.10.0.0/16"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "firstOutput": "[split(parameters('addressSapce'), '.')]",
+    "mask1": "[variables('firstOutput')[0]]",
+    "mask2": "[variables('firstOutput')[1]]"
+  },
+  "resources": [],
+  "outputs": {
+    "sub1": {
+      "type": "string",
+      "value": "[format('{0}.{1}.250.0/26', variables('mask1'), variables('mask2'))]"
+    },
+    "sub2": {
+      "type": "string",
+      "value": "[format('{0}.{1}.1.0/24', variables('mask1'), variables('mask2'))]"
+    },
+    "sub3": {
+      "type": "string",
+      "value": "[format('{0}.{1}.123.0/24', variables('mask1'), variables('mask2'))]"
+    },
+    "sub4": {
+      "type": "string",
+      "value": "[format('{0}[0].{1}[1].250.0/26', variables('firstOutput'), variables('firstOutput'))]"
+    }
+  }
+}
