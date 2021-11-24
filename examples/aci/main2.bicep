@@ -1,6 +1,6 @@
 param containerName string //= 'go-app1'
 param location string = 'westeurope'
-param imageName string = 'markkerry/go-app:v1'
+param imageName string = 'linuxserver/nzbget'
 param cpuCores int = 1
 param memoryInGb int = 1
 param dnsName string //= 'gowebapp001fsk'
@@ -23,7 +23,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2019-12-01'
           ports: [
             {
               protocol: 'TCP'
-              port: 3000
+              port: 6789
             }
           ]
         }
@@ -37,7 +37,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2019-12-01'
       ports: [
         {
           protocol: 'TCP'
-          port: 3000
+          port: 6789
         }
       ]
     }
@@ -45,5 +45,5 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2019-12-01'
 }
 
 output containerIpv4Address string = containerGroup.properties.ipAddress.ip
-output containerDnsName string = '${containerGroup.properties.ipAddress.fqdn}'
+output containerDnsName string = containerGroup.properties.ipAddress.fqdn
 output url string = 'http://${containerGroup.properties.ipAddress.fqdn}:${containerGroup.properties.containers[0].properties.ports[0].port}'
