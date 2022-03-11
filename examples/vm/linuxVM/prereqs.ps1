@@ -1,3 +1,5 @@
+## Pre-req
+
 ## Create required ssh-keys
 ## Requires ssh-keygen to be installed
 
@@ -16,3 +18,7 @@ $password = read-host "password" -AsSecureString
 ssh-keygen -m PEM -t rsa -b 4096 -C $vmName -f $privateKeyPath -N $password 
 
 notepad $publicKeyPath
+
+##Deploy
+
+$sshKey = Get-Content $publicKeyPath   
