@@ -1,15 +1,20 @@
+@description('Specifies the location for the deployment.')
 param location string = 'northeurope'
 
-param hubname string = 'deploy-hub1'
+@description('Specifies the name of the vwan hub.')
+param hubname string = 'hub1'
 
 @description('Specifies the Virtual Hub Address Prefix.')
 param hubaddressprefix string = '10.10.10.0/24'
 
-param hubvpngwname string = 'deploy-hub1-vpngw1'
+@description('Specifies the name of the vpn gateway.')
+param hubvpngwname string = 'hub1-vpngw1'
 
-param hubergwname string = 'deploy-hub1-ergw1'
+@description('Specifies the name of the expressroute gateway.')
+param hubergwname string = 'hub1-ergw1'
 
-param vpnsitename string = 'deploy-vwan1-hub1-vpnsite1'
+@description('Specifies the name of the vpn site.')
+param vpnsitename string = 'vwan1-hub1-vpnsite1'
 
 @secure()
 @description('Pre-Shared Key used to establish the site to site tunnel between the Virtual Hub and On-Prem VNet')
@@ -17,6 +22,9 @@ param psk string //= uniqueString(subscription().id)
 
 @description('Specifices the VPN Sites VPN Device IP Address')
 param ipaddress string = '109.255.28.125'
+
+@description('Specifices the VPN Sites VPN Device FQDN')
+param fqdn string = 'ingress.fskelly.com'
 
 @description('Specifices the VPN Sites local IP Addresses')
 param addressprefix string = '192.168.1.0/24'
@@ -59,7 +67,6 @@ resource hub 'Microsoft.Network/virtualHubs@2020-06-01' = {
   }
 }
 
-
 resource hubvpngw 'Microsoft.Network/vpnGateways@2020-06-01' = {
   name: hubvpngwname
   location: location
@@ -89,14 +96,27 @@ resource vpnsite 'Microsoft.Network/vpnSites@2021-05-01' = {
     //  peerWeight: 0
     //}
     deviceProperties: {
-      linkSpeedInMbps: 0
+      linkSpeedInMbps: 500
+      deviceModel: 'USG'
+      deviceVendor: 'Unifi'
     }
-    //fqdn: ipaddress
     ipAddress: ipaddress
     virtualWan: {
       //id: wanid
       id: virtualWan.id
     }
+/*     vpnSiteLinks: [
+      {
+        name: 'sitelink1'
+        properties: {
+          fqdn: fqdn
+          linkProperties: {
+            linkProviderName: 'VirginMedia'
+            linkSpeedInMbps: 500
+          }
+        }
+      }
+    ] */
   }
 }
 
@@ -111,7 +131,9 @@ resource hubvpnconnection 'Microsoft.Network/vpnGateways/vpnConnections@2020-05-
       id: vpnsite.id
     }
   }
-
+  dependsOn: [
+    hubergw
+  ]
 }
 
 resource vnet1 'Microsoft.Network/virtualNetworks@2021-05-01' = {

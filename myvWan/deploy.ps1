@@ -1,5 +1,5 @@
 ## Place Resource Group Name here
-$rgName = "flkelly-vwan-deploy-301"
+$rgName = "flkelly-vwan-deploy-1001"
 ## add tags if you want to add metadata
 $tags = @{"deploymentMethod"="bicep"; "Can Be Deleted"="yes"}
 ## location to be deployed into
