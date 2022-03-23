@@ -7,6 +7,8 @@ param hubaddressprefix string = '10.10.10.0/24'
 
 param hubvpngwname string = 'deploy-hub1-vpngw1'
 
+param hubergwname string = 'deploy-hub1-ergw1'
+
 param vpnsitename string = 'deploy-vwan1-hub1-vpnsite1'
 
 @secure()
@@ -172,4 +174,19 @@ resource vnet1connection 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnect
   dependsOn: [
     hubvpngw
   ]
+}
+
+resource hubergw 'Microsoft.Network/expressRouteGateways@2021-05-01' = {
+  name: hubergwname
+  location: location
+  properties: {
+    autoScaleConfiguration: {
+      bounds: {
+        min: 1
+      }
+    }
+    virtualHub: {
+      id: hub.id
+    }
+  }
 }
