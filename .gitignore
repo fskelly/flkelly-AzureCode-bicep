@@ -8,5 +8,11 @@ development/**
 .vscode/**
 .vscode/
 .vscode
+
+#ignore vwan
 /vWAN
+/vWAN/**
+
+#ignore vwan-example
 /vwan-gh-example
+/vwan-gh-example/**
