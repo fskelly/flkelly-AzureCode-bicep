@@ -17,6 +17,7 @@ vWAN
 /vWAN/**
 vWAN/
 
+!.json
 
 #ignore vwan-example
 vwan-gh-example
