@@ -8,19 +8,4 @@ development/**
 .vscode/**
 .vscode/
 .vscode
-/vWAN
-/vwan-gh-example
-
-#ignore vwan
-vWAN
-/vWAN
-/vWAN/**
-vWAN
-
-
-
-#ignore vwan-example
-vwan-gh-example
-/vwan-gh-example
-/vwan-gh-example/**
-vwan-gh-example/
+/testing
