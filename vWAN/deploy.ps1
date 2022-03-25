@@ -6,4 +6,4 @@ $deploymentLocation = "northeurope"
 ## Bicep File name
 $bicepFile = ".\main.bicep"
 $deploymentName = ($bicepFile).Substring(2) + "-" +(get-date -Format ddMMyyyy-hhmmss) + "-deployment"
-New-AzSubscriptionDeployment -Name $deploymentName -Location $deploymentLocation -Tag $tags -TemplateFile $bicepFile
+New-AzSubscriptionDeployment -Name $deploymentName -Location $deploymentLocation -Tag $tags -TemplateFile $bicepFile -location northeurope -vwanlocation northeurope

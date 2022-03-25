@@ -1,13 +1,13 @@
 targetScope = 'subscription'
 
 @description('Specify the location for the hub Virtual Network and its related resources')
-param location string = 'westeurope'
+param location string //= 'westeurope'
 
 @description('Specify the location for the vWAN and its related resources')
-param vwanlocation string = 'westeurope'
+param vwanlocation string //= 'westeurope'
 
 @description('Specify the name prefix for all resources and resource groups')
-param nameprefix string = 'ffstest01'
+param nameprefix string = 'ffstest101'
 
 @secure()
 @description('Pre-Shared Key used to establish the site to site tunnel between the Virtual Hub and On-Prem VNet')
