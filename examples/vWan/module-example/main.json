@@ -1,0 +1,990 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.1124.51302",
+      "templateHash": "10533854044633144695"
+    }
+  },
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the location for the deployment."
+      }
+    },
+    "vwanRGName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-vwan-{1}', parameters('prefix'), parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the resource group for the VWan."
+      }
+    },
+    "vwanRGLocation": {
+      "type": "string",
+      "defaultValue": "northeurope",
+      "metadata": {
+        "description": "Specifies the location of the resource group for the VWan."
+      }
+    },
+    "vhubRGName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-vhub-{1}', parameters('prefix'), parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the resource group for the VWan."
+      }
+    },
+    "vhubRGLocation": {
+      "type": "string",
+      "defaultValue": "northeurope",
+      "metadata": {
+        "description": "Specifies the location of the resource group for the VWan."
+      }
+    },
+    "vwanName": {
+      "type": "string",
+      "defaultValue": "[format('wan1-{0}', parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the vwan instance."
+      }
+    },
+    "vwanHubName": {
+      "type": "string",
+      "defaultValue": "[format('hub1-{0}', parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the vwan hub."
+      }
+    },
+    "vwanHubAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.10.10.0/24",
+      "metadata": {
+        "description": "Specifies the Virtual Hub Address Prefix."
+      }
+    },
+    "vwanHubGatewayName": {
+      "type": "string",
+      "defaultValue": "[format('hub1-{0}-vpngw1', parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the vpn gateway."
+      }
+    },
+    "vwanHubVpnSiteName": {
+      "type": "string",
+      "defaultValue": "[format('hub1-{0}-vpnsite1', parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the vpn gateway."
+      }
+    },
+    "hubExpressRouteGatewayName": {
+      "type": "string",
+      "defaultValue": "[format('hub1-{0}-exrgw1', parameters('vwanRGLocation'))]",
+      "metadata": {
+        "description": "Specifies the name of the virtual hub instance."
+      }
+    },
+    "psk": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Pre-Shared Key used to establish the site to site tunnel between the Virtual Hub and On-Prem VNet"
+      }
+    },
+    "vpnDeviceIP": {
+      "type": "string",
+      "defaultValue": "109.255.28.125",
+      "metadata": {
+        "description": "Specifices the IP Address of the VPN gateway device"
+      }
+    },
+    "vpnRangeCIDR": {
+      "type": "string",
+      "defaultValue": "192.168.1.0/24",
+      "metadata": {
+        "description": "Specifices the VPN Sites local IP Addresses"
+      }
+    },
+    "vnetCIDR": {
+      "type": "string",
+      "defaultValue": "172.16.10.0/24",
+      "metadata": {
+        "description": "Specifices the VNET1 Address Prefix"
+      }
+    },
+    "snetName": {
+      "type": "string",
+      "defaultValue": "snet1",
+      "metadata": {
+        "description": "Specifies the name of the subnet."
+      }
+    },
+    "snetCIDR": {
+      "type": "string",
+      "defaultValue": "172.16.10.0/26",
+      "metadata": {
+        "description": "Specifices the Subnet1 Address Prefix"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "vnet1",
+      "metadata": {
+        "description": "Specifices the VNET1 name"
+      }
+    },
+    "deployVnetConnection": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether or not to deploy vnet connection."
+      }
+    },
+    "deployS2SConnection": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether or not to deploy s2s connection."
+      }
+    },
+    "deployExRConnection": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether or not to deploy ExR connection."
+      }
+    },
+    "vwantype": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "vwan hub SKU"
+      },
+      "allowedValues": [
+        "Standard",
+        "Basic"
+      ]
+    },
+    "disableVpnEncryption": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable / disable VpnEncryption"
+      }
+    },
+    "allowBranchToBranchTraffic": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable / disable branch to branch traffic"
+      }
+    },
+    "allowVnetToVnetTraffic": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable / disable vnet to vnet traffic"
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {
+        "Environment": "PoC",
+        "Project": "vWan Tutorial",
+        "Deployment": "Bicep",
+        "Can Be Deleted": "Yes"
+      },
+      "metadata": {
+        "description": "Specifies the tags top be added to the resources."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('vwanRGName')]",
+      "location": "[parameters('vwanRGLocation')]",
+      "tags": "[parameters('resourceTags')]"
+    },
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('vhubRGName')]",
+      "location": "[parameters('vhubRGLocation')]",
+      "tags": "[parameters('resourceTags')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('deploy-{0}', parameters('vwanName'))]",
+      "resourceGroup": "[parameters('vwanRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "vwantype": {
+            "value": "[parameters('vwantype')]"
+          },
+          "disableVpnEncryption": {
+            "value": "[parameters('disableVpnEncryption')]"
+          },
+          "allowBranchToBranchTraffic": {
+            "value": "[parameters('allowBranchToBranchTraffic')]"
+          },
+          "allowVnetToVnetTraffic": {
+            "value": "[parameters('allowVnetToVnetTraffic')]"
+          },
+          "vwanLocation": {
+            "value": "[parameters('vwanRGLocation')]"
+          },
+          "vwanName": {
+            "value": "[parameters('vwanName')]"
+          },
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "8293828632312765766"
+            }
+          },
+          "parameters": {
+            "vwanName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the vwan instance."
+              }
+            },
+            "vwanLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the location for the deployment."
+              }
+            },
+            "disableVpnEncryption": {
+              "type": "bool",
+              "metadata": {
+                "description": "Enable / disable VpnEncryption"
+              }
+            },
+            "allowBranchToBranchTraffic": {
+              "type": "bool",
+              "metadata": {
+                "description": "Enable / disable branch to branch traffic"
+              }
+            },
+            "allowVnetToVnetTraffic": {
+              "type": "bool",
+              "metadata": {
+                "description": "Enable / disable vnet to vnet traffic"
+              }
+            },
+            "vwantype": {
+              "type": "string",
+              "defaultValue": "Standard",
+              "metadata": {
+                "description": "vwan hub SKU"
+              },
+              "allowedValues": [
+                "Standard",
+                "Basic"
+              ]
+            },
+            "resourceTags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualWans",
+              "apiVersion": "2020-07-01",
+              "name": "[parameters('vwanName')]",
+              "location": "[parameters('vwanLocation')]",
+              "tags": "[parameters('resourceTags')]",
+              "properties": {
+                "type": "[parameters('vwantype')]",
+                "disableVpnEncryption": "[parameters('disableVpnEncryption')]",
+                "allowBranchToBranchTraffic": "[parameters('allowBranchToBranchTraffic')]",
+                "allowVnetToVnetTraffic": "[parameters('allowVnetToVnetTraffic')]",
+                "office365LocalBreakoutCategory": "Optimize"
+              }
+            }
+          ],
+          "outputs": {
+            "vWanID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualWans', parameters('vwanName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vwanRGName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('deploy-{0}', parameters('vwanHubName'))]",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "vwanHubAddressPrefix": {
+            "value": "[parameters('vwanHubAddressPrefix')]"
+          },
+          "hubName": {
+            "value": "[parameters('vwanHubName')]"
+          },
+          "vwanID": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vwanRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanName'))), '2020-10-01').outputs.vWanID.value]"
+          },
+          "vwanHubLocation": {
+            "value": "[parameters('vhubRGLocation')]"
+          },
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "12277579950905485919"
+            }
+          },
+          "parameters": {
+            "hubName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the virtual hub instance."
+              }
+            },
+            "vwanHubLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the location for the deployment."
+              }
+            },
+            "vwanHubAddressPrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the IP CIDR for the vWan Hub."
+              }
+            },
+            "vwanID": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the ID for the vWan."
+              }
+            },
+            "resourceTags": {
+              "type": "object",
+              "metadata": {
+                "description": "Specifies the tags top be added to the resources."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualHubs",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('hubName')]",
+              "location": "[parameters('vwanHubLocation')]",
+              "tags": "[parameters('resourceTags')]",
+              "properties": {
+                "addressPrefix": "[parameters('vwanHubAddressPrefix')]",
+                "virtualWan": {
+                  "id": "[parameters('vwanID')]"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "hubID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualHubs', parameters('hubName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vwanRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanName')))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployS2SConnection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('deploy-{0}', parameters('vwanHubGatewayName'))]",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          },
+          "vwanHubGatewayName": {
+            "value": "[parameters('vwanHubGatewayName')]"
+          },
+          "vwanHubID": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubName'))), '2020-10-01').outputs.hubID.value]"
+          },
+          "vwanHubLocation": {
+            "value": "[parameters('vhubRGLocation')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "3544199201815013534"
+            }
+          },
+          "parameters": {
+            "vwanHubGatewayName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the virtual hub instance."
+              }
+            },
+            "vwanHubLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the location for the deployment."
+              }
+            },
+            "vwanHubID": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the ID for the Virtual Wan Hub."
+              }
+            },
+            "resourceTags": {
+              "type": "object",
+              "metadata": {
+                "description": "Specifies the tags top be added to the resources."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/vpnGateways",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('vwanHubGatewayName')]",
+              "location": "[parameters('vwanHubLocation')]",
+              "tags": "[parameters('resourceTags')]",
+              "properties": {
+                "virtualHub": {
+                  "id": "[parameters('vwanHubID')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubName')))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployS2SConnection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('deploy-{0}', parameters('vwanHubVpnSiteName'))]",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          },
+          "vwanHubID": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vwanRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanName'))), '2020-10-01').outputs.vWanID.value]"
+          },
+          "vwanHubVpnSiteName": {
+            "value": "[parameters('vwanHubVpnSiteName')]"
+          },
+          "vwanHubLocation": {
+            "value": "[parameters('vhubRGLocation')]"
+          },
+          "vpnDeviceIP": {
+            "value": "[parameters('vpnDeviceIP')]"
+          },
+          "vpnRangeCIDR": {
+            "value": "[parameters('vpnRangeCIDR')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "4386868329564709796"
+            }
+          },
+          "parameters": {
+            "vwanHubVpnSiteName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the VPN Site instance."
+              }
+            },
+            "vwanHubLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the location for the deployment."
+              }
+            },
+            "vpnRangeCIDR": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifices the VPN Sites local IP Addresses"
+              }
+            },
+            "vpnDeviceIP": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifices the IP Address of the VPN gateway device"
+              }
+            },
+            "vwanHubID": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the ID for the Virtual Wan Hub."
+              }
+            },
+            "resourceTags": {
+              "type": "object",
+              "metadata": {
+                "description": "Specifies the tags top be added to the resources."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/vpnSites",
+              "apiVersion": "2021-05-01",
+              "name": "[parameters('vwanHubVpnSiteName')]",
+              "location": "[parameters('vwanHubLocation')]",
+              "tags": "[parameters('resourceTags')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "[parameters('vpnRangeCIDR')]"
+                  ]
+                },
+                "deviceProperties": {
+                  "linkSpeedInMbps": 500,
+                  "deviceModel": "USG",
+                  "deviceVendor": "Unifi"
+                },
+                "ipAddress": "[parameters('vpnDeviceIP')]",
+                "virtualWan": {
+                  "id": "[parameters('vwanHubID')]"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "vwanHubVpnSiteID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/vpnSites', parameters('vwanHubVpnSiteName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vwanRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanName')))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployExRConnection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('deploy-{0}', parameters('hubExpressRouteGatewayName'))]",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          },
+          "virtualHubID": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubName'))), '2020-10-01').outputs.hubID.value]"
+          },
+          "hubExpressRouteGatewayName": {
+            "value": "[parameters('hubExpressRouteGatewayName')]"
+          },
+          "vwanHubLocation": {
+            "value": "[parameters('vhubRGLocation')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "1007142661414945942"
+            }
+          },
+          "parameters": {
+            "hubExpressRouteGatewayName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the virtual hub instance."
+              }
+            },
+            "vwanHubLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the location for the deployment."
+              }
+            },
+            "virtualHubID": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the ID for the vWan."
+              }
+            },
+            "resourceTags": {
+              "type": "object",
+              "metadata": {
+                "description": "Specifies the tags top be added to the resources."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/expressRouteGateways",
+              "apiVersion": "2021-05-01",
+              "name": "[parameters('hubExpressRouteGatewayName')]",
+              "location": "[parameters('vwanHubLocation')]",
+              "tags": "[parameters('resourceTags')]",
+              "properties": {
+                "autoScaleConfiguration": {
+                  "bounds": {
+                    "min": 1
+                  }
+                },
+                "virtualHub": {
+                  "id": "[parameters('virtualHubID')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubName')))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployVnetConnection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('deploy-{0}', parameters('vnetName'))]",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "resourceTags": {
+            "value": "[parameters('resourceTags')]"
+          },
+          "snetCIDR": {
+            "value": "[parameters('snetCIDR')]"
+          },
+          "snetName": {
+            "value": "[parameters('snetName')]"
+          },
+          "vnetCIDR": {
+            "value": "[parameters('vnetCIDR')]"
+          },
+          "vnetLocation": {
+            "value": "[parameters('vhubRGLocation')]"
+          },
+          "vnetName": {
+            "value": "[parameters('vnetName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "15312197671266337147"
+            }
+          },
+          "parameters": {
+            "vnetName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the virtual network."
+              }
+            },
+            "vnetLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the location of the virtual network."
+              }
+            },
+            "vnetCIDR": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the CIDR of the virtual network."
+              }
+            },
+            "snetName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the subnet."
+              }
+            },
+            "snetCIDR": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the CIDR of the subnet."
+              }
+            },
+            "resourceTags": {
+              "type": "object",
+              "metadata": {
+                "description": "Specifies the tags top be added to the resources."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2021-05-01",
+              "name": "[parameters('vnetName')]",
+              "location": "[parameters('vnetLocation')]",
+              "tags": "[parameters('resourceTags')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "[parameters('vnetCIDR')]"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "[parameters('snetName')]",
+                    "properties": {
+                      "addressPrefix": "[parameters('snetCIDR')]"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": {
+            "vnetID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployVnetConnection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "deploy-vnetconnection",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "virtualWanHubName": {
+            "value": "[parameters('vwanHubName')]"
+          },
+          "vnetID": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vnetName'))), '2020-10-01').outputs.vnetID.value]"
+          },
+          "vnetName": {
+            "value": "[parameters('vnetName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "3340030014736752361"
+            }
+          },
+          "parameters": {
+            "vnetName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the vnet name for vnet connection."
+              }
+            },
+            "vnetID": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the vnet ID for vnet connection."
+              }
+            },
+            "virtualWanHubName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualHubs/hubVirtualNetworkConnections",
+              "apiVersion": "2021-05-01",
+              "name": "[format('{0}/{1}', parameters('virtualWanHubName'), format('{0}-{1}', parameters('virtualWanHubName'), parameters('vnetName')))]",
+              "properties": {
+                "allowHubToRemoteVnetTransit": true,
+                "allowRemoteVnetToUseHubVnetGateways": true,
+                "enableInternetSecurity": false,
+                "remoteVirtualNetwork": {
+                  "id": "[parameters('vnetID')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vnetName')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubGatewayName')))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployS2SConnection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "deploy-vpnconnection",
+      "resourceGroup": "[parameters('vhubRGName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "psk": {
+            "value": "[parameters('psk')]"
+          },
+          "remoteVpnSiteID": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubVpnSiteName'))), '2020-10-01').outputs.vwanHubVpnSiteID.value]"
+          },
+          "vwanHubGatewayName": {
+            "value": "[parameters('vwanHubGatewayName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.1124.51302",
+              "templateHash": "7127001918627474568"
+            }
+          },
+          "parameters": {
+            "vwanHubGatewayName": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the name of the van hub gateway."
+              }
+            },
+            "psk": {
+              "type": "secureString",
+              "metadata": {
+                "description": "Pre-Shared Key used to establish the site to site tunnel between the Virtual Hub and On-Prem VNet"
+              }
+            },
+            "remoteVpnSiteID": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the ID of the VPN Site"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/vpnGateways/vpnConnections",
+              "apiVersion": "2020-05-01",
+              "name": "[format('{0}/{1}', parameters('vwanHubGatewayName'), format('{0}-HubToOnPremConnection', parameters('vwanHubGatewayName')))]",
+              "properties": {
+                "connectionBandwidth": 10,
+                "enableBgp": false,
+                "sharedKey": "[parameters('psk')]",
+                "remoteVpnSite": {
+                  "id": "[parameters('remoteVpnSiteID')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vhubRGName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubGatewayName')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vhubRGName')), 'Microsoft.Resources/deployments', format('deploy-{0}', parameters('vwanHubVpnSiteName')))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "vwanRG": {
+      "type": "string",
+      "value": "[parameters('vwanRGName')]"
+    },
+    "vhubRG": {
+      "type": "string",
+      "value": "[parameters('vhubRGName')]"
+    }
+  }
+}
