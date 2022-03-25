@@ -1,6 +1,6 @@
 *.certificate.ps1
 *.key.azcli
-*.parameters.json
+#*.parameters.json
 *.personal.*
 #*.json
 data/**
@@ -15,9 +15,9 @@ development/**
 vWAN
 /vWAN
 /vWAN/**
-vWAN/
+vWAN
 
-!.json
+
 
 #ignore vwan-example
 vwan-gh-example
