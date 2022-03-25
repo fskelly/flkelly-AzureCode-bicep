@@ -62,6 +62,12 @@ param vnetName string = 'vnet1'
 @description('Specifies whether or not to deploy vnet connection.')
 param deployVnetConnection bool = false
 
+@description('Specifies whether or not to deploy s2s connection.')
+param deployS2SConnection bool = false
+
+@description('Specifies whether or not to deploy ExR connection.')
+param deployExRConnection bool = false
+
 //@description('BGP AS-number for the VPN Gateway')
 //param asn int
 
@@ -126,14 +132,13 @@ module vwanHub 'modules/vwanhub.bicep' = {
     hubName: vwanHubName
     vwanID: virtualWan.outputs.vWanID
     vwanHubLocation: vhubRGLocation
-    deployVnetConnection: deployVnetConnection
     resourceTags: resourceTags
     //vnetID: virtualNetwork.outputs.vnetID
     //vnetName: vnetName
   }
 }
 
-module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = {
+module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = if (deployS2SConnection) {
   name: 'deploy-${vwanHubGatewayName}'
   scope: vhubRG
   params: {
@@ -149,7 +154,7 @@ module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = {
   //]
 }
 
-module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = {
+module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = if (deployS2SConnection) {
   name: 'deploy-${vwanHubVpnSiteName}'
   scope: vhubRG
   params: {
@@ -165,7 +170,7 @@ module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = {
   //]
 }
 
-module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = {
+module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = if (deployExRConnection) {
   name: 'deploy-${hubExpressRouteGatewayName}'
   scope: vhubRG
   params: {
@@ -176,7 +181,7 @@ module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = {
   }
 }
 
-module virtualNetwork 'modules/vnet.bicep' = {
+module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection) {
   //name: 'deploy-vnetconnection'{
   name: 'deploy-${vnetName}'
   scope: vhubRG
@@ -190,7 +195,7 @@ module virtualNetwork 'modules/vnet.bicep' = {
   }
 }
 
-module vnetConnection 'modules/vnetconnection.bicep' = {
+module vnetConnection 'modules/vnetconnection.bicep' = if (deployVnetConnection) {
   scope: vhubRG
   name: 'deploy-vnetconnection'
   params: {
@@ -204,7 +209,7 @@ module vnetConnection 'modules/vnetconnection.bicep' = {
   ]
 }
 
-module vpnConnection 'modules/vwanhubvpnconnection.bicep' = {
+module vpnConnection 'modules/vwanhubvpnconnection.bicep' = if (deployS2SConnection) {
   scope: vhubRG
   name: 'deploy-vpnconnection'
   params: {
