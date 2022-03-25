@@ -2,7 +2,7 @@
 *.key.azcli
 *.parameters.json
 *.personal.*
-*.json
+#*.json
 data/**
 development/**
 .vscode/**
@@ -12,9 +12,14 @@ development/**
 /vwan-gh-example
 
 #ignore vwan
+vWAN
 /vWAN
 /vWAN/**
+vWAN/
+
 
 #ignore vwan-example
+vwan-gh-example
 /vwan-gh-example
 /vwan-gh-example/**
+vwan-gh-example/
