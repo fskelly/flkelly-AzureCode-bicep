@@ -60,10 +60,10 @@ param snetCIDR string = '172.16.10.0/26'
 param vnetName string = 'vnet1'
 
 @description('Specifies whether or not to deploy vnet connection.')
-param deployVnetConnection bool //= false
+param deployVnetConnection bool = false
 
 @description('Specifies whether or not to deploy s2s connection.')
-param deployS2SConnection bool //= false
+param deployS2SConnection bool = true
 
 @description('Specifies whether or not to deploy ExR connection.')
 param deployExRConnection bool = true
@@ -181,7 +181,7 @@ module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = if (deployExRConnection)
   }
 }
 
-module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection) {
+module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection == true) {
   //name: 'deploy-vnetconnection'{
   name: 'deploy-${vnetName}'
   scope: vhubRG
