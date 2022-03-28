@@ -105,7 +105,7 @@ resource vwanRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: resourceTags
 }
 
-resource vhubRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+resource vhubRG 'Microsoft.Resources/resourceGroups@2021-04-01' = if (deployVnetConnection) {
   name: vhubRGName
   location: vhubRGLocation
   tags: resourceTags
@@ -127,7 +127,7 @@ module virtualWan 'modules/vwan.bicep' = {
 
 module vwanHub 'modules/vwanhub.bicep' = {
   name: 'deploy-${vwanHubName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     vwanHubAddressPrefix: vwanHubAddressPrefix
     hubName: vwanHubName
@@ -141,7 +141,7 @@ module vwanHub 'modules/vwanhub.bicep' = {
 
 module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = if (deployS2SConnection) {
   name: 'deploy-${vwanHubGatewayName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     vwanHubGatewayName: vwanHubGatewayName
@@ -157,7 +157,7 @@ module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = if (deployS2SConnection)
 
 module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = if (deployS2SConnection) {
   name: 'deploy-${vwanHubVpnSiteName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     vwanHubID: virtualWan.outputs.vWanID
@@ -173,7 +173,7 @@ module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = if (deployS2SConnection) 
 
 module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = if (deployExRConnection) {
   name: 'deploy-${hubExpressRouteGatewayName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     virtualHubID: vwanHub.outputs.hubID
@@ -197,7 +197,7 @@ module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection == true) {
 }
 
 module vnetConnection 'modules/vnetconnection.bicep' = if (deployVnetConnection) {
-  scope: vhubRG
+  scope: vwanRG
   name: 'deploy-vnetconnection'
   params: {
     //hubName: vwanHubName
@@ -211,7 +211,7 @@ module vnetConnection 'modules/vnetconnection.bicep' = if (deployVnetConnection)
 }
 
 module vpnConnection 'modules/vwanhubvpnconnection.bicep' = if (deployS2SConnection) {
-  scope: vhubRG
+  scope: vwanRG
   name: 'deploy-vpnconnection'
   params: {
     psk: psk
