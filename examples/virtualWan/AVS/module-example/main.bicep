@@ -91,6 +91,7 @@ param allowVnetToVnetTraffic bool = true
 param resourceTags object = {
   Environment: 'PoC'
   Project: 'vWan Tutorial'
+  Technology: 'AVS'
   Deployment: 'Bicep'
   'Can Be Deleted': 'Yes'
 }
