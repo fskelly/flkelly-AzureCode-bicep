@@ -39,7 +39,7 @@ param hubExpressRouteGatewayName string = 'hub1-${vwanRGLocation}-exrgw1'
 param psk string
 
 @description('Specifices the IP Address of the VPN gateway device')
-param vpnDeviceIP string = '109.255.28.125'
+param vpnDeviceIP string // = '1.2.3.4'
 
 //@description('Specifices the VPN Sites VPN Device FQDN')
 //param fqdn string = 'device.fqdn'
@@ -66,7 +66,7 @@ param deployVnetConnection bool //= false
 param deployS2SConnection bool //= false
 
 @description('Specifies whether or not to deploy ExR connection.')
-param deployExRConnection bool //= false
+param deployExRConnection bool = true
 
 //@description('BGP AS-number for the VPN Gateway')
 //param asn int
