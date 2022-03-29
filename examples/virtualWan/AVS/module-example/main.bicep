@@ -10,8 +10,8 @@ param vwanRGName string = '${prefix}-vwan-${vwanRGLocation}'
 @description('Specifies the location of the resource group for the VWan.')
 param vwanRGLocation string = 'northeurope'
 
-@description('Specifies the name of the resource group for the VWan.')
-param vhubRGName string = '${prefix}-vhub-${vwanRGLocation}'
+//@description('Specifies the name of the resource group for the VWan.')
+//param vhubRGName string = '${prefix}-vhub-${vwanRGLocation}'
 
 @description('Specifies the location of the resource group for the VWan.')
 param vhubRGLocation string = 'northeurope'
@@ -105,11 +105,11 @@ resource vwanRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: resourceTags
 }
 
-resource vhubRG 'Microsoft.Resources/resourceGroups@2021-04-01' = if (deployVnetConnection) {
-  name: vhubRGName
-  location: vhubRGLocation
-  tags: resourceTags
-}
+//resource vhubRG 'Microsoft.Resources/resourceGroups@2021-04-01' = if (deployVnetConnection) {
+//  name: vhubRGName
+//  location: vhubRGLocation
+//  tags: resourceTags
+//}
 
 module virtualWan 'modules/vwan.bicep' = {
   name: 'deploy-${vwanName}'
@@ -185,7 +185,7 @@ module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = if (deployExRConnection)
 module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection == true) {
   //name: 'deploy-vnetconnection'{
   name: 'deploy-${vnetName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     snetCIDR: snetCIDR
@@ -224,4 +224,4 @@ module vpnConnection 'modules/vwanhubvpnconnection.bicep' = if (deployS2SConnect
 }
 
 output vwanRG string = vwanRG.name
-output vhubRG string = deployVnetConnection ? vhubRG.name : ''
+//output vhubRG string = deployVnetConnection ? vhubRG.name : ''

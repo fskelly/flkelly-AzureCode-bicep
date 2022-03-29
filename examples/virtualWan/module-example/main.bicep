@@ -10,8 +10,8 @@ param vwanRGName string = '${prefix}-vwan-${vwanRGLocation}'
 @description('Specifies the location of the resource group for the VWan.')
 param vwanRGLocation string = 'northeurope'
 
-@description('Specifies the name of the resource group for the VWan.')
-param vhubRGName string = '${prefix}-vhub-${vwanRGLocation}'
+//@description('Specifies the name of the resource group for the VWan.')
+//param vhubRGName string = '${prefix}-vhub-${vwanRGLocation}'
 
 @description('Specifies the location of the resource group for the VWan.')
 param vhubRGLocation string = 'northeurope'
@@ -39,7 +39,7 @@ param hubExpressRouteGatewayName string = 'hub1-${vwanRGLocation}-exrgw1'
 param psk string
 
 @description('Specifices the IP Address of the VPN gateway device')
-param vpnDeviceIP string = '109.255.28.125'
+param vpnDeviceIP string // = '1.2.3.4'
 
 //@description('Specifices the VPN Sites VPN Device FQDN')
 //param fqdn string = 'device.fqdn'
@@ -60,13 +60,13 @@ param snetCIDR string = '172.16.10.0/26'
 param vnetName string = 'vnet1'
 
 @description('Specifies whether or not to deploy vnet connection.')
-param deployVnetConnection bool //= false
+param deployVnetConnection bool = false
 
 @description('Specifies whether or not to deploy s2s connection.')
-param deployS2SConnection bool //= false
+param deployS2SConnection bool = true
 
 @description('Specifies whether or not to deploy ExR connection.')
-param deployExRConnection bool //= false
+param deployExRConnection bool = true
 
 //@description('BGP AS-number for the VPN Gateway')
 //param asn int
@@ -91,6 +91,7 @@ param allowVnetToVnetTraffic bool = true
 param resourceTags object = {
   Environment: 'PoC'
   Project: 'vWan Tutorial'
+  Technology: 'AVS'
   Deployment: 'Bicep'
   'Can Be Deleted': 'Yes'
 }
@@ -104,11 +105,11 @@ resource vwanRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: resourceTags
 }
 
-resource vhubRG 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: vhubRGName
-  location: vhubRGLocation
-  tags: resourceTags
-}
+//resource vhubRG 'Microsoft.Resources/resourceGroups@2021-04-01' = if (deployVnetConnection) {
+//  name: vhubRGName
+//  location: vhubRGLocation
+//  tags: resourceTags
+//}
 
 module virtualWan 'modules/vwan.bicep' = {
   name: 'deploy-${vwanName}'
@@ -126,7 +127,7 @@ module virtualWan 'modules/vwan.bicep' = {
 
 module vwanHub 'modules/vwanhub.bicep' = {
   name: 'deploy-${vwanHubName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     vwanHubAddressPrefix: vwanHubAddressPrefix
     hubName: vwanHubName
@@ -140,7 +141,7 @@ module vwanHub 'modules/vwanhub.bicep' = {
 
 module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = if (deployS2SConnection) {
   name: 'deploy-${vwanHubGatewayName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     vwanHubGatewayName: vwanHubGatewayName
@@ -156,7 +157,7 @@ module vwanHubVpnGateway 'modules/vwanhubvpngw.bicep' = if (deployS2SConnection)
 
 module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = if (deployS2SConnection) {
   name: 'deploy-${vwanHubVpnSiteName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     vwanHubID: virtualWan.outputs.vWanID
@@ -172,7 +173,7 @@ module vwanHubVpnSite 'modules/vwanhubvpnsite.bicep' = if (deployS2SConnection) 
 
 module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = if (deployExRConnection) {
   name: 'deploy-${hubExpressRouteGatewayName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     virtualHubID: vwanHub.outputs.hubID
@@ -181,10 +182,10 @@ module vwanHubExRGateway 'modules/vwanhubexrgw.bicep' = if (deployExRConnection)
   }
 }
 
-module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection) {
+module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection == true) {
   //name: 'deploy-vnetconnection'{
   name: 'deploy-${vnetName}'
-  scope: vhubRG
+  scope: vwanRG
   params: {
     resourceTags: resourceTags
     snetCIDR: snetCIDR
@@ -196,7 +197,7 @@ module virtualNetwork 'modules/vnet.bicep' = if (deployVnetConnection) {
 }
 
 module vnetConnection 'modules/vnetconnection.bicep' = if (deployVnetConnection) {
-  scope: vhubRG
+  scope: vwanRG
   name: 'deploy-vnetconnection'
   params: {
     //hubName: vwanHubName
@@ -210,7 +211,7 @@ module vnetConnection 'modules/vnetconnection.bicep' = if (deployVnetConnection)
 }
 
 module vpnConnection 'modules/vwanhubvpnconnection.bicep' = if (deployS2SConnection) {
-  scope: vhubRG
+  scope: vwanRG
   name: 'deploy-vpnconnection'
   params: {
     psk: psk
@@ -223,4 +224,4 @@ module vpnConnection 'modules/vwanhubvpnconnection.bicep' = if (deployS2SConnect
 }
 
 output vwanRG string = vwanRG.name
-output vhubRG string = vhubRG.name
+//output vhubRG string = deployVnetConnection ? vhubRG.name : ''
