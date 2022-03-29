@@ -224,4 +224,4 @@ module vpnConnection 'modules/vwanhubvpnconnection.bicep' = if (deployS2SConnect
 }
 
 output vwanRG string = vwanRG.name
-output vhubRG string = vhubRG.name
+output vhubRG string = deployVnetConnection ? vhubRG.name : ''
