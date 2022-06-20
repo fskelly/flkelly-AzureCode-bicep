@@ -8,9 +8,13 @@ $privateKeyPath = ""
 ## Deploy to Azure
 $resourceGroupName = ""
 $resourceGroupLocation = ""
+$userName = ""
 New-AzResourceGroup -Name $resourceGroupName -Location $resourceGroupLocation
-New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile ./main.bicep -adminUsername "azureUser" -adminPasswordOrKey $secureSSHKey
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile ./main.bicep -adminUsername $userName -adminPasswordOrKey $secureSSHKey
 $hostName = (Get-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName).outputs.hostname.value
 
+## Adding slight delay
+Start-Sleep 5
+
 ## Connect to the vm
-ssh -i $privateKeyPath azureUser@$hostName
+ssh -i $privateKeyPath $userName@$hostName
