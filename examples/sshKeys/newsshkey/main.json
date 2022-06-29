@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.7.4.23292",
+      "templateHash": "10979981956173692375"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "northeurope"
+    },
+    "sshKeyName": {
+      "type": "string",
+      "defaultValue": "sshkeys1"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/sshPublicKeys",
+      "apiVersion": "2022-03-01",
+      "name": "[parameters('sshKeyName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Use": "Testing",
+        "CanBeDeleted": "yes"
+      },
+      "properties": {
+        "publicKey": "string"
+      }
+    }
+  ]
+}
