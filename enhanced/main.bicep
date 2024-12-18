@@ -1,5 +1,5 @@
 // Control parameters
-param deployKV bool = false
+param deployKV bool
 
 // Resource Group parameters
 param rgName string
@@ -11,7 +11,8 @@ param storageAccountName string
 
 // Keyvault parameters
 param vaultNamePrefix string = 'kv'
-var vaultName = '${vaultNamePrefix}${uniqueString(rgID)}'
+// var rgID = createRg ? resource_group.id : existingRg.id
+var vaultName = '${vaultNamePrefix}${uniqueString(existingRg.id)}'
 param location string = rgLocation
 param sku string = 'Standard'
 param objectID string
@@ -79,19 +80,19 @@ param userPassword string
 // Global parameters
 targetScope = 'subscription'
 
-var rgID = createRg ? resource_group.id : existingRg.id
+// var rgID = createRg ? resource_group.id : existingRg.id
 
-resource resource_group 'Microsoft.Resources/resourceGroups@2021-04-01' = if (createRg) {   
-    name: rgName
-    location: rgLocation
-}
+// resource resource_group 'Microsoft.Resources/resourceGroups@2021-04-01' = if (createRg) {   
+//     name: rgName
+//     location: rgLocation
+// }
 
 resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!createRg) {
   name: rgName
 }
 
 // Variable to reference the resource group
-var rgReference = createRg ? resource_group : existingRg
+// var rgReference = createRg ? resource_group : existingRg
 
 module storageAccountModule './storageAccount/storageAccount.bicep' = {
     name: 'deploy-storage-account'
@@ -100,7 +101,7 @@ module storageAccountModule './storageAccount/storageAccount.bicep' = {
       storageAccountName: storageAccountName
       location: rgLocation
     }
-    dependsOn: createRg ? [resource_group] : [existingRg]
+    dependsOn: [existingRg]
 }
   
 module keyVaultModule './azureKeyVault/kv.bicep' = if (deployKV){
@@ -138,9 +139,9 @@ module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = if (deployK
 
 // outputs
 output rgName string = rgName
-output rgID string = createRg ? resource_group.id : existingRg.id
+output rgID string = existingRg.id
 output rgLocation string = rgLocation
 output storageAccountName string = storageAccountModule.outputs.storageAccountName
 output storageAccountId string = storageAccountModule.outputs.storageAccountId
-output keyVaultName string = keyVaultModule.outputs.keyVaultName
-output keyVaultId string = keyVaultModule.outputs.keyVaultId
+output keyVaultName string = deployKV ? keyVaultModule.outputs.keyVaultName : ''
+output keyVaultId string = deployKV ? keyVaultModule.outputs.keyVaultId : ''
