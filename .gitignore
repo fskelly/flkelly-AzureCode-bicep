@@ -9,3 +9,4 @@ development/**
 .vscode/
 .vscode
 /testing
+/enhanced/fk-deploy.ps1

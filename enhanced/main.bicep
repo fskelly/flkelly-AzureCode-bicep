@@ -1,4 +1,5 @@
-
+// Control parameters
+param deployKV bool = false
 
 // Resource Group parameters
 param rgName string
@@ -102,7 +103,7 @@ module storageAccountModule './storageAccount/storageAccount.bicep' = {
     dependsOn: createRg ? [resource_group] : [existingRg]
 }
   
-module keyVaultModule './azureKeyVault/kv.bicep' = {
+module keyVaultModule './azureKeyVault/kv.bicep' = if (deployKV){
   name: 'deploy-keyvault'
   scope: resourceGroup(rgName)
   params: {
@@ -123,7 +124,7 @@ module keyVaultModule './azureKeyVault/kv.bicep' = {
   
 }
 
-module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = {
+module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = if (deployKV) {
   name: 'deploy-keyvault-secrets'
   scope: resourceGroup(rgName)
   params: {

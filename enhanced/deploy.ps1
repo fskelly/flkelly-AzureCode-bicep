@@ -5,8 +5,17 @@ $rgLocation = read-host "Enter the location for the resource group."
 # storage account variables
 
 # kv variables
-$tenantID = read-host "Enter the tenant ID."
-$objectID = read-host "Enter the object ID."
+#$deployKV = read-host "Do you want to deploy a Key Vault? (y/n)"
+$deployKV = "N"
+if ($deployKV -eq "y") {
+    #$kvName = read-host "Enter the name of the Key Vault to be created."
+    #$kvLocation = read-host "Enter the location for the Key Vault."
+    #$kvSku = read-host "Enter the SKU for the Key Vault."
+    #$kvAccessPolicy = read-host "Enter the object ID for the Key Vault access policy."
+    $tenantID = read-host "Enter the tenant ID."
+    $objectID = read-host "Enter the object ID."
+}
+
 
 $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
 
@@ -31,5 +40,8 @@ if (-not $rg) {
     #$deploymentName = "main.bicep-deployment"
     #New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -DeploymentName $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -verbose
 }
-
-New-AzSubscriptionDeployment -TemplateFile $bicepFile -Location $deploymentLocation -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -verbose -tenant $tenantID -objectID $objectID
+if ($deployKV -eq "y") {
+    New-AzSubscriptionDeployment -TemplateFile $bicepFile -Location $deploymentLocation -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -verbose -tenant $tenantID -objectID $objectID
+} else {
+    New-AzSubscriptionDeployment -TemplateFile $bicepFile -Location $deploymentLocation -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -verbose
+}
