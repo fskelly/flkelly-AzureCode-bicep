@@ -31,11 +31,11 @@ if (-not $rg) {
     New-AzSubscriptionDeployment -TemplateFile $rgBicepFile -Location $rgLocation -Name $rgDeploymentName -rgName $rgName -rgLocation $rgLocation -verbose
     Write-Output "Resource group $rgName created successfully."
     write-output "Deploying the main template now..."
-    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -userName $userName -userPassword $userPassword -deployKV $deployKV -verbose
+    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -deployKV $deployKV -verbose
 } elseif ($rg.Location -ne $rgLocation) {
     Write-Output "Resource group $rgName exists in a different location ($($rg.Location)). Please use the correct location."
     exit 1
 } else {
     Write-Output "Resource group $rgName already exists in the correct location. Continuing..."
-    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -userName $userName -userPassword $userPassword -deployKV $deployKV -verbose
+    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -deployKV $deployKV -verbose
 }

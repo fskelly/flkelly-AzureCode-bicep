@@ -96,7 +96,7 @@ resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = i
 // var rgReference = createRg ? resource_group : existingRg
 
 module storageAccountModule './storageAccount/storageAccount.bicep' = {
-    name: 'deploy-storage-account'
+    name: 'deploy-storage-account-${storageAccountName}'
     scope: resourceGroup(rgName)
     params: {
       storageAccountName: storageAccountName
@@ -106,7 +106,7 @@ module storageAccountModule './storageAccount/storageAccount.bicep' = {
 }
   
 module keyVaultModule './azureKeyVault/kv.bicep' = if (deployKV){
-  name: 'deploy-keyvault'
+  name: 'deploy-keyvault-${vaultName}'
   scope: resourceGroup(rgName)
   params: {
     objectID: objectID
@@ -127,7 +127,7 @@ module keyVaultModule './azureKeyVault/kv.bicep' = if (deployKV){
 }
 
 module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = if (deployKV) {
-  name: 'deploy-keyvault-secrets'
+  name: 'deploy-keyvault-${vaultName}-secrets'
   scope: resourceGroup(rgName)
   params: {
     userName: userName
