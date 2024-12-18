@@ -6,8 +6,9 @@ param rgName string
 param rgLocation string
 param createRg bool
 
-//Storage Account parameters
-param storageAccountName string
+// Storage Account parameters
+param storageAccountPrefix string = 'st'
+var storageAccountName = '${storageAccountPrefix}${uniqueString(rgName)}'
 
 // Keyvault parameters
 param vaultNamePrefix string = 'kv'
