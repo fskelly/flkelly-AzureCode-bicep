@@ -1,5 +1,12 @@
+# resource group variables
 $rgName = read-host "Enter the name of the resource group to be created."
 $rgLocation = read-host "Enter the location for the resource group."
+
+# storage account variables
+
+# kv variables
+$tenantID = read-host "Enter the tenant ID."
+$objectID = read-host "Enter the object ID."
 
 $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
 
@@ -21,4 +28,4 @@ if (-not $rg) {
     #New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -DeploymentName $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -verbose
 }
 
-New-AzSubscriptionDeployment -TemplateFile $bicepFile -Location $deploymentLocation -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -verbose
+New-AzSubscriptionDeployment -TemplateFile $bicepFile -Location $deploymentLocation -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -verbose -tenant $tenantID -objectID $objectID

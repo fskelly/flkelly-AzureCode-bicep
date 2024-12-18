@@ -1,34 +1,36 @@
+param vaultName string
+param location string
+param sku string
+param objectID string
+param tenantID string
 param accessPolicies array
 param enabledForDeployment bool
-param enabledForDiskEncryption bool
 param enabledForTemplateDeployment bool
-param softDeleteRetentionInDays int
+param enabledForDiskEncryption bool
 param enableRbacAuthorization bool
-param networkAcls object
 param enableSoftDelete bool
-param location string
-param vaultName string
-param tenantID string
-param sku string
+param softDeleteRetentionInDays int
+param networkAcls object
 
-resource keyvault 'Microsoft.KeyVault/vaults@2019-09-01' = {
+resource keyVault 'Microsoft.KeyVault/vaults@2021-04-01-preview' = {
   name: vaultName
   location: location
   properties: {
-    tenantId: tenantID
     sku: {
       family: 'A'
       name: sku
     }
+    tenantId: tenantID
     accessPolicies: accessPolicies
     enabledForDeployment: enabledForDeployment
-    enabledForDiskEncryption: enabledForDiskEncryption
     enabledForTemplateDeployment: enabledForTemplateDeployment
-    softDeleteRetentionInDays: softDeleteRetentionInDays
+    enabledForDiskEncryption: enabledForDiskEncryption
     enableRbacAuthorization: enableRbacAuthorization
-    networkAcls: networkAcls
     enableSoftDelete: enableSoftDelete
+    softDeleteRetentionInDays: softDeleteRetentionInDays
+    networkAcls: networkAcls
   }
 }
 
-output keyVaultName string = keyvault.name
+output keyVaultName string = keyVault.name
+output keyVaultId string = keyVault.id
