@@ -10,6 +10,10 @@ $objectID = read-host "Enter the object ID."
 
 $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
 
+$deploymentLocation = "westeurope"
+$bicepFile = ".\main.bicep"
+$deploymentName = ($bicepFile).Substring(2) + "-" +(get-date -Format ddMMyyyy-hhmmss) + "-deployment"
+
 $createRg = $false
 if (-not $rg) {
     Write-Output "Setting createRG variable to TRUE."

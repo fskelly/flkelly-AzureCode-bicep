@@ -1,3 +1,5 @@
+
+
 // Resource Group parameters
 param rgName string
 param rgLocation string
@@ -88,15 +90,16 @@ resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = i
 }
 
 // Variable to reference the resource group
-//var rgReference = createRg ? resource_group : existingRg
+var rgReference = createRg ? resource_group : existingRg
 
 module storageAccountModule './storageAccount/storageAccount.bicep' = {
-    name: 'storageAccountDeployment'
+    name: 'deploy-storage-account'
     scope: resourceGroup(rgName)
     params: {
       storageAccountName: storageAccountName
       location: rgLocation
     }
+    dependsOn: createRg ? [resource_group] : [existingRg]
 }
   
 module keyVaultModule './azureKeyVault/kv.bicep' = {
