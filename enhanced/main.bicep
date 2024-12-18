@@ -12,12 +12,11 @@ var storageAccountName = '${storageAccountPrefix}${uniqueString(rgName)}'
 
 // Keyvault parameters
 param vaultNamePrefix string = 'kv'
-// var rgID = createRg ? resource_group.id : existingRg.id
 var vaultName = '${vaultNamePrefix}${uniqueString(existingRg.id)}'
 param location string = rgLocation
 param sku string = 'Standard'
 param objectID string
-param tenantID string //= '' replace with your tenantId
+param tenantID string
 param accessPolicies array = [
   {
     tenantId: tenantID
@@ -78,22 +77,13 @@ param networkAcls object = {
 param userName string
 @secure()
 param userPassword string
+
 // Global parameters
 targetScope = 'subscription'
-
-// var rgID = createRg ? resource_group.id : existingRg.id
-
-// resource resource_group 'Microsoft.Resources/resourceGroups@2021-04-01' = if (createRg) {   
-//     name: rgName
-//     location: rgLocation
-// }
 
 resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!createRg) {
   name: rgName
 }
-
-// Variable to reference the resource group
-// var rgReference = createRg ? resource_group : existingRg
 
 module storageAccountModule './storageAccount/storageAccount.bicep' = {
     name: 'deploy-storage-account-${storageAccountName}'
