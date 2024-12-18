@@ -1,20 +1,22 @@
-
+// Control parameters
+param deployKV bool
 
 // Resource Group parameters
 param rgName string
 param rgLocation string
 param createRg bool
 
-//Storage Account parameters
-param storageAccountName string
+// Storage Account parameters
+param storageAccountPrefix string = 'st'
+var storageAccountName = '${storageAccountPrefix}${uniqueString(rgName)}'
 
 // Keyvault parameters
 param vaultNamePrefix string = 'kv'
-var vaultName = '${vaultNamePrefix}${uniqueString(rgID)}'
+var vaultName = '${vaultNamePrefix}${uniqueString(existingRg.id)}'
 param location string = rgLocation
 param sku string = 'Standard'
 param objectID string
-param tenantID string //= '' replace with your tenantId
+param tenantID string
 param accessPolicies array = [
   {
     tenantId: tenantID
@@ -75,35 +77,26 @@ param networkAcls object = {
 param userName string
 @secure()
 param userPassword string
+
 // Global parameters
 targetScope = 'subscription'
-
-var rgID = createRg ? resource_group.id : existingRg.id
-
-resource resource_group 'Microsoft.Resources/resourceGroups@2021-04-01' = if (createRg) {   
-    name: rgName
-    location: rgLocation
-}
 
 resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!createRg) {
   name: rgName
 }
 
-// Variable to reference the resource group
-var rgReference = createRg ? resource_group : existingRg
-
 module storageAccountModule './storageAccount/storageAccount.bicep' = {
-    name: 'deploy-storage-account'
+    name: 'deploy-storage-account-${storageAccountName}'
     scope: resourceGroup(rgName)
     params: {
       storageAccountName: storageAccountName
       location: rgLocation
     }
-    dependsOn: createRg ? [resource_group] : [existingRg]
+    dependsOn: [existingRg]
 }
   
-module keyVaultModule './azureKeyVault/kv.bicep' = {
-  name: 'deploy-keyvault'
+module keyVaultModule './azureKeyVault/kv.bicep' = if (deployKV){
+  name: 'deploy-keyvault-${vaultName}'
   scope: resourceGroup(rgName)
   params: {
     objectID: objectID
@@ -123,8 +116,8 @@ module keyVaultModule './azureKeyVault/kv.bicep' = {
   
 }
 
-module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = {
-  name: 'deploy-keyvault-secrets'
+module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = if (deployKV) {
+  name: 'deploy-keyvault-${vaultName}-secrets'
   scope: resourceGroup(rgName)
   params: {
     userName: userName
@@ -137,9 +130,9 @@ module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = {
 
 // outputs
 output rgName string = rgName
-output rgID string = createRg ? resource_group.id : existingRg.id
+output rgID string = existingRg.id
 output rgLocation string = rgLocation
 output storageAccountName string = storageAccountModule.outputs.storageAccountName
 output storageAccountId string = storageAccountModule.outputs.storageAccountId
-output keyVaultName string = keyVaultModule.outputs.keyVaultName
-output keyVaultId string = keyVaultModule.outputs.keyVaultId
+output keyVaultName string = deployKV ? keyVaultModule.outputs.keyVaultName : ''
+output keyVaultId string = deployKV ? keyVaultModule.outputs.keyVaultId : ''
