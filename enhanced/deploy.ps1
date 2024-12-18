@@ -28,7 +28,7 @@ if (-not $rg) {
     $createRg = $true
     $rgBicepFile = "./resourceGroups/rg.bicep"
     $rgDeploymentName = "rg-deployment-" + (Get-Date -Format "yyyyMMddHHmmss")
-    New-AzSubscriptionDeployment -TemplateFile $rgBicepFile -Location $rgLocation -Name $rgDeploymentName -rgName $rgName -rgLocation $rgLocation -verbose
+    New-AzSubscriptionDeployment -TemplateFile $rgBicepFile -Location $deploymentLocation -Name $rgDeploymentName -rgName $rgName -rgLocation $rgLocation -verbose
     Write-Output "Resource group $rgName created successfully."
     write-output "Deploying the main template now..."
     New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -deployKV $deployKV -verbose
