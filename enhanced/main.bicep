@@ -1,5 +1,6 @@
 // Control parameters
 param deployKV bool
+param deploySecrets bool
 
 // Resource Group parameters
 param rgName string
@@ -115,7 +116,7 @@ module keyVaultModule './azureKeyVault/kv.bicep' = if (deployKV){
   
 }
 
-module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = if (deployKV) {
+module keyVaultSecretModule './azureKeyVault/keyVaultSecret.bicep' = if (deployKV && deploySecrets) {
   name: 'deploy-keyvault-${vaultName}-secrets'
   scope: resourceGroup(rgName)
   params: {
