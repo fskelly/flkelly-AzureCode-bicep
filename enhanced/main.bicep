@@ -4,7 +4,6 @@ param deployKV bool
 // Resource Group parameters
 param rgName string
 param rgLocation string
-param createRg bool
 
 // Storage Account parameters
 param storageAccountPrefix string = 'st'
@@ -81,7 +80,7 @@ param userPassword string
 // Global parameters
 targetScope = 'subscription'
 
-resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!createRg) {
+resource existingRg 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: rgName
 }
 

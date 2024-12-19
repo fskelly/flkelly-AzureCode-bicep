@@ -1,3 +1,5 @@
+## this deploys without using the parameter files
+
 # resource group variables
 $rgName = read-host "Enter the name of the resource group to be created."
 $rgLocation = read-host "Enter the location for the resource group."
@@ -21,21 +23,18 @@ $deploymentLocation = "westeurope"
 $bicepFile = ".\main.bicep"
 $deploymentName = ($bicepFile).Substring(2) + "-" +(get-date -Format ddMMyyyy-hhmmss) + "-deployment"
 
-$createRg = $false
 if (-not $rg) {
-    Write-Output "Setting createRG variable to TRUE."
     write-output "Resource group $rgName does not exist. Creating it now..."
-    $createRg = $true
     $rgBicepFile = "./resourceGroups/rg.bicep"
     $rgDeploymentName = "rg-deployment-" + (Get-Date -Format "yyyyMMddHHmmss")
-    New-AzSubscriptionDeployment -TemplateFile $rgBicepFile -Location $deploymentLocation -Name $rgDeploymentName -rgName $rgName -rgLocation $rgLocation -verbose
+    New-AzSubscriptionDeployment -TemplateFile $rgBicepFile -Location $deploymentLocation -Name $rgDeploymentName -rgName $rgName -rgLocation $rgLocation #-verbose
     Write-Output "Resource group $rgName created successfully."
     write-output "Deploying the main template now..."
-    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -deployKV $deployKV -verbose
+    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -tenant $tenantID -objectID $objectID -deployKV $deployKV #-verbose
 } elseif ($rg.Location -ne $rgLocation) {
     Write-Output "Resource group $rgName exists in a different location ($($rg.Location)). Please use the correct location."
     exit 1
 } else {
     Write-Output "Resource group $rgName already exists in the correct location. Continuing..."
-    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -createRg $createRg -tenant $tenantID -objectID $objectID -deployKV $deployKV -verbose
+    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile $bicepFile -Name $deploymentName -rgName $rgName -rgLocation $rgLocation -tenant $tenantID -objectID $objectID -deployKV $deployKV #-verbose
 }
